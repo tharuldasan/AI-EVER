@@ -13,7 +13,16 @@ const systemPrompt =
 const startBtn = document.getElementById("startBtn");
 const messagesDiv = document.getElementById("messages");
 
+const voiceSelect = document.getElementById("voiceSelect");
+const pitchInput = document.getElementById("pitch");
+const rateInput = document.getElementById("rate");
+const volumeInput = document.getElementById("volume");
+const pitchVal = document.getElementById("pitchVal");
+const rateVal = document.getElementById("rateVal");
+const volumeVal = document.getElementById("volumeVal");
+
 let conv = [{ role: "system", content: systemPrompt }];
+let voices = [];
 
 // 🧩 Helper: add messages
 function addMessage(role, text) {
@@ -24,26 +33,38 @@ function addMessage(role, text) {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// 🗣️ Alvin-style Tappy voice
+// 🎤 Populate voices
+function loadVoices() {
+  voices = window.speechSynthesis.getVoices();
+  voiceSelect.innerHTML = "";
+  voices.forEach((v, i) => {
+    const option = document.createElement("option");
+    option.value = i;
+    option.textContent = `${v.name} (${v.lang})`;
+    voiceSelect.appendChild(option);
+  });
+}
+window.speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+
+// 🗣️ Speak with custom controls
 function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "en-US";
-  utter.rate = 1.45;   // Speed up a bit
-  utter.pitch = 20;   // High pitch = chipmunk vibe 🐿️
-  utter.volume = 1.50;
+  utter.pitch = parseFloat(pitchInput.value);
+  utter.rate = parseFloat(rateInput.value);
+  utter.volume = parseFloat(volumeInput.value);
 
-  const voices = window.speechSynthesis.getVoices();
-  const childVoice = voices.find(v =>
-    v.name.toLowerCase().includes("child") ||
-    v.name.toLowerCase().includes("boy") ||
-    v.name.toLowerCase().includes("girl") ||
-    v.name.toLowerCase().includes("zira") ||
-    v.name.toLowerCase().includes("english")
-  );
-  if (childVoice) utter.voice = childVoice;
+  const selectedVoice = voices[voiceSelect.value];
+  if (selectedVoice) utter.voice = selectedVoice;
 
   window.speechSynthesis.speak(utter);
 }
+
+// Update sliders display
+pitchInput.oninput = () => pitchVal.textContent = pitchInput.value;
+rateInput.oninput = () => rateVal.textContent = rateInput.value;
+volumeInput.oninput = () => volumeVal.textContent = volumeInput.value;
 
 // 🤖 Talk to Qwen AI
 async function getAI(text) {
@@ -108,7 +129,3 @@ startBtn.onclick = async () => {
     startBtn.disabled = false;
   };
 };
-
-
-
-
