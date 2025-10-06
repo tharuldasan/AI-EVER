@@ -29,8 +29,8 @@ function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "en-US";
   utter.rate = 1.45;   // Speed up a bit
-  utter.pitch = 5.5;   // High pitch = chipmunk vibe 🐿️
-  utter.volume = 1;
+  utter.pitch = 20;   // High pitch = chipmunk vibe 🐿️
+  utter.volume = 2;
 
   const voices = window.speechSynthesis.getVoices();
   const childVoice = voices.find(v =>
@@ -108,3 +108,4 @@ startBtn.onclick = async () => {
     startBtn.disabled = false;
   };
 };
+
