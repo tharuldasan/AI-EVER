@@ -7,9 +7,13 @@
 <body>
   <h1>TAPPY AI</h1>
   <button id="start">Start Conversation</button>
+
   <div>
-    <p><strong>Last Reply:</strong> <span id="lastReply"></span></p>
+    <p><strong>You said:</strong> <span id="userText"></span></p>
+    <p><strong>AI Reply:</strong> <span id="aiReply"></span></p>
   </div>
+
+  <audio id="audioPlayback" controls></audio>
 
   <script src="app.js"></script>
 </body>
