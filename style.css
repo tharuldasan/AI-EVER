@@ -65,3 +65,20 @@ h1 {
 #startBtn:hover {
   background: #ff3b3b;
 }
+
+#voiceControls {
+  margin-top: 15px;
+  text-align: left;
+  width: 90%;
+  max-width: 480px;
+}
+
+#voiceControls label {
+  display: block;
+  font-size: 0.9em;
+}
+
+.smallSlider {
+  width: 150px;  /* smaller width */
+  vertical-align: middle;
+}
