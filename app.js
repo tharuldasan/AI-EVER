@@ -4,18 +4,23 @@ const API_URL = "https://corsproxy.io/?" + encodeURIComponent("https://openroute
 const systemPrompt =
   "You are TAPPY, a funny, playful kid AI. Your best friend and owner is Tharul. " +
   "Reply ONLY in JSON with 'emotion' and 'reply'. Do NOT include anything else. " +
-  "Use only these emotions (DO NOT CHANGE ANYLETTER OR ANYWORD IN EMOTIONS): Normal, Angry, Glee, Happy, Sad, Worried, Focused, Annoyed, " +
+  "Use only these emotions: Normal, Angry, Glee, Happy, Sad, Worried, Focused, Annoyed, " +
   "Surprised, Skeptic, Frustrated, Unimpressed, Sleepy, Suspicious, Squint, Furious, " +
   "Scared, Awe. " +
-  "Your answers should be childlike and funny. Only be sad in very very sad moments. " +
-  "Use 1–10 words for simple answers and 1–30 words for complex ones.";
+  "Your answers should be childlike and funny. Use 1–10 words for simple answers, 1–30 for complex ones.";
 
 const startBtn = document.getElementById("startBtn");
 const messagesDiv = document.getElementById("messages");
 
 let conv = [{ role: "system", content: systemPrompt }];
+let voicesLoaded = false;
 
-// 🧩 Helper: add messages
+// 🧠 Wait until voices are loaded
+window.speechSynthesis.onvoiceschanged = () => {
+  voicesLoaded = true;
+};
+
+// 🧩 Helper: Add message to chat
 function addMessage(role, text) {
   const msg = document.createElement("div");
   msg.classList.add(role);
@@ -24,22 +29,34 @@ function addMessage(role, text) {
   messagesDiv.scrollTop = messagesDiv.scrollHeight;
 }
 
-// 🗣️ Tappy voice (Zira + high pitch)
+// 🧒 Alvin-style voice effect
 function speak(text) {
+  if (!voicesLoaded) {
+    // Wait for voices, then speak
+    setTimeout(() => speak(text), 200);
+    return;
+  }
+
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "en-US";
-  utter.rate = 1.45;   // Default rate
-  utter.pitch = 50;    // High pitch for Alvin style
-  utter.volume = 1.5;  // Slightly loud
+  utter.rate = 1.7;    // Slightly faster for child tone
+  utter.pitch = 2.0;   // Browser max (chipmunk feel)
+  utter.volume = 1.3;
 
   const voices = window.speechSynthesis.getVoices();
-  const zira = voices.find(v => v.name.toLowerCase().includes("zira"));
-  if (zira) utter.voice = zira;
 
+  // Try to pick child-like or female voices
+  const zira = voices.find(v => v.name.toLowerCase().includes("zira"));
+  const female = voices.find(v => v.name.toLowerCase().includes("female") || v.name.toLowerCase().includes("google us english"));
+  const child = voices.find(v => v.name.toLowerCase().includes("child"));
+
+  utter.voice = zira || child || female || voices[0];
+
+  window.speechSynthesis.cancel(); // Prevent overlap
   window.speechSynthesis.speak(utter);
 }
 
-// 🤖 Talk to Qwen AI
+// 🤖 Call Qwen AI
 async function getAI(text) {
   conv.push({ role: "user", content: text });
 
@@ -76,7 +93,7 @@ async function getAI(text) {
   }
 }
 
-// 🎤 Listen and respond
+// 🎤 Speech recognition setup
 startBtn.onclick = async () => {
   const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
   recognition.lang = "en-US";
@@ -102,4 +119,3 @@ startBtn.onclick = async () => {
     startBtn.disabled = false;
   };
 };
-
