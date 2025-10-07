@@ -29,7 +29,7 @@ function speak(text) {
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = "en-US";
   utter.rate = 1.45;   // Default rate
-  utter.pitch = 10;    // High pitch for Alvin style
+  utter.pitch = 50;    // High pitch for Alvin style
   utter.volume = 1.5;  // Slightly loud
 
   const voices = window.speechSynthesis.getVoices();
@@ -102,3 +102,4 @@ startBtn.onclick = async () => {
     startBtn.disabled = false;
   };
 };
+
